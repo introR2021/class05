@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Programando funções e interações</title>
+    <meta charset="utf-8" />
+    <meta name="author" content=" Renata Oliveira e Lucélia Vaz" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/font-awesome/css/all.css" rel="stylesheet" />
+    <link href="libs/font-awesome/css/v4-shims.css" rel="stylesheet" />
+    <link href="libs/panelset/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset/panelset.js"></script>
+    <link href="libs/tile-view/tile-view.css" rel="stylesheet" />
+    <script src="libs/tile-view/tile-view.js"></script>
+    <script type="application/json" id="xaringanExtra-editable-docid">{"id":"x29d90d1721d4313b784fcafd73e338b","expires":1}</script>
+    <script src="libs/himalaya/himalaya.js"></script>
+    <script src="libs/js-cookie/js.cookie.js"></script>
+    <link href="libs/editable/editable.css" rel="stylesheet" />
+    <script src="libs/editable/editable.js"></script>
+    <script src="libs/clipboard/clipboard.min.js"></script>
+    <link href="libs/xaringanExtra-clipboard/xaringanExtra-clipboard.css" rel="stylesheet" />
+    <script src="libs/xaringanExtra-clipboard/xaringanExtra-clipboard.js"></script>
+    <script>window.xaringanExtraClipboard(null, {"button":"<i class=\"fa fa-clipboard\"><\/i>","success":"<i class=\"fa fa-check\" style=\"color: #90BE6D\"><\/i>","error":"<i class=\"fa fa-times-circle\" style=\"color: #F94144\"><\/i>"})</script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+    <link rel="stylesheet" href="slides.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Programando funções e interações
+## Mais sobre gráficos
+### <br></br>Renata Oliveira e Lucélia Vaz
+### 16/11/21
+
+---
+
+
+
+
+
+layout: true
+  
+&lt;div class="my-footer"&gt;
+&lt;span&gt;
+&lt;a href="https://retaoliveira.github.io/places" target="_blank"&gt;https://retaoliveira.github.io/places&lt;/a&gt;
+&lt;/span&gt;
+&lt;/div&gt; 
+
+---
+
+
+
+
+
+
+
+
+
+
+
+
+class: center, middle
+
+## Retrospecto
+
+---
+
+## Modelo conceitual da análise de dados
+
+![Modelo de Data Science](https://retaoliveira.github.io/relements/figures/dataR.png)
+
+---
+
+## Funções, iteração e vetorialização do código
+
+Neste breve tutorial vamos ver alguns exemplos de como criar funções e utilizar processos iterativos (loops) reduzem bastante o esforço de programação e tornam o programa mais eficiente.
+
+Estes exemplos servirão de norte para que você leia, em sala, os capítulos [19 - Functions](http://r4ds.had.co.nz/functions.html), [20 - Iteration](http://r4ds.had.co.nz/iteration.html), e o trecho do capítulo [18 - Vectors](http://r4ds.had.co.nz/vectors.html#lists) que trata de listas.
+
+---
+
+## Exemplo 1 - substituindo repetição de código por loops
+
+Imagine que você precisa organizar dados dos candidatos à presidência de diversos anos (2006 a 2014) e vai utilizar a API do CEPESP Data. Utilizando a função _get_candidates_ do pacote _cepespR_ podemos obter os dados:
+
+
+```r
+library(cepespR)
+candidatos06 &lt;- get_candidates(year = 2006, position = "President")
+candidatos10 &lt;- get_candidates(year = 2010, position = "President")
+candidatos14 &lt;- get_candidates(year = 2014, position = "President")
+```
+
+e, a seguir, podemos juntar todos em um único data_frame:
+
+
+```r
+candidatos &lt;- rbind(candidatos06, candidatos10, candidatos14)
+```
+
+---
+
+## Exemplo 1 - substituindo repetição de código por loops
+
+### Como podemos evitar a repetição de códigos?
+
+No exemplo acima, um simples _for loop_ resolveria nosso problema de repetição de código. Veja abaixo e tente entender sozinha(o) o que está acontencendo:
+
+
+```r
+library(dplyr)
+vetor_anos &lt;- c(2006, 2010, 2014)
+candidatos &lt;- data.frame()
+
+for (ano in vetor_anos){
+  candidatos &lt;- bind_rows(candidatos, 
+                get_candidates(year = ano, position = "President"))
+}
+```
+
+---
+
+## Exemplo 1 - substituindo repetição de código por loops
+
+Vamos supor agora que não queremos juntar todos os anos, apenas contar o número de linhas (que é o número de candidatos) em cada um dos anos e armazenar o resultado em um vetor. Veja como fazemos isso com um _for loop_:
+
+
+```r
+n_candidatos &lt;- c()
+for (ano in vetor_anos){
+  n_candidatos &lt;- c(n_candidatos, nrow(get_candidates(year = ano, position = "President")))
+}
+```
+
+Note que podemos pensar um _for loop_ como uma função que recebe como argumento um vetor e realiza a mesma tarefa para cada elemento do vetor.
+
+---
+
+## Exemplo 2 - combinando loops e funções
+
+Uma das bases mais estudadas em política comparada e estudos empíricos sobre é a Polity IV, que contém varáveis sobre diversas características de um conjunto grande de países e em vários anos. Quem quiser conhecer mais sobre os dados pode acessar [aqui](http://www.systemicpeace.org/inscrdata.html) ou ler a documentação [aqui](http://www.systemicpeace.org/inscr/p4manualv2016.pdf).
+
+A principal variável da base de dados é um indicador de grau de democracia que resulta da combinação de um conjunto variáveis componentes codificadas diretamente a partir da observação dos casos. Vamos ignorar seus significados e apenas observar que essas variáveis componentes recebem valores de 0 a 7, se o caso for uma democracia, ou os códigos -66, -77 e -88 em períodos autoritários ou de transição.
+
+---
+
+## Exemplo 2 - combinando loops e funções
+
+Comece abrindo os dados que estão no repositório do curso e criando uma cópia, 'p4', que será modificada.
+
+
+```r
+p4_raw &lt;- read.csv2("https://raw.githubusercontent.com/leobarone/FLS6397_2018/master/data/p4v2016.csv")
+p4 &lt;- p4_raw
+```
+
+---
+
+## Exemplo 2 - combinando loops e funções
+Como as variáveis contêm alguns códigos numéricos cujas distâncias matemáticas não fazem nenhum sentido (-66, -77 e -88), precisamos transformá-los em NA para podermos calcular qualquer estatística descritiva com a variável. Vamos realizar a transformação nas variáveis 'xconst', 'xrreg', 'xropen', 'xconst' e aprender um novo operador, _%in%_. Todas as variáveis se referem sobre características da competição pelo poder Executivo em um país em um ano:
+
+
+```r
+p4$xrcomp[p4$xrcomp %in% c(-66, -77, -88)] &lt;- NA
+p4$xrreg[p4$xrreg %in% c(-66, -77, -88)] &lt;- NA
+p4$xropen[p4$xropen %in% c(-66, -77, -88)] &lt;- NA
+p4$xconst[p4$xconst %in% c(-66, -77, -88)] &lt;- NA
+```
+
+---
+
+## Exemplo 2 - combinando loops e funções
+
+Como vamos repetir a mesma transformação de variáveis diversas vezes, convém escrever uma função para tal transformação. Observe com cuidado o código abaixo: 
+
+
+```r
+limpa_var &lt;- function(x) {
+  x[x %in% c(-66, -77, -88)] &lt;- NA
+  return(x)
+}
+```
+
+---
+
+## Exemplo 2 - combinando loops e funções
+
+Vamos refazer o código acima utilizando a função que acabamos de criar (lembre-se criar um novo objeto 'p4', pois as variáveis foram transformadas no código anterior):
+
+
+```r
+p4 &lt;- p4_raw
+p4$xrcomp &lt;- limpa_var(p4$xrcomp)
+p4$xrreg &lt;- limpa_var(p4$xrreg)
+p4$xropen &lt;- limpa_var(p4$xropen)
+p4$xconst &lt;- limpa_var(p4$xconst)
+```
+
+---
+
+## Exemplo 2 - combinando loops e funções
+
+Ainda assim, temos muitas repetições de linha. O que muda de uma linha à outra é apenas o nome da variável. Como vimos no caso anterior, podemos realizar tarefas repetidas em loop. Vamos, dessa forma, aplicar a função que criamos em loop:
+
+
+```r
+p4 &lt;- p4_raw
+vetor_var &lt;- c('xrcomp', 'xrreg', 'xropen', 'xconst')
+for (var in vetor_var){
+  p4[, var] &lt;- limpa_var(p4[, var])
+}
+```
+
+
+---
+
+## Exemplo 2 - combinando loops e funções
+
+Se estívessemos utilizando todas as variáveis do banco de dados codificadas da mesma maneira (são várias) teríamos uma economia bastante importante de código.
+
+Obs: uma forma alternativa de selecionar variáveis de um data frame utilizando colchetes é aplicando colchetes duplo (em vez de separar linhas e colunas dentro do colchetes por vírgula). O estilo de código abaixo, encontrado com frequência no livro "R for Data Science", é equivalente ao que acabamos de ver.
+
+
+```r
+for (var in vetor_var){
+  p4[[var]] &lt;- limpa_var(p4[[var]])
+}
+```
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightLines": true,
+"highlightStyle": "solarized-light",
+"countIncrementalSlides": false,
+"slideNumberFormat": "<div class=\"progress-bar-container\">\n  <div class=\"progress-bar\" style=\"width: calc(%current% / %total% * 100%);\">\n  </div>\n</div>\n"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
