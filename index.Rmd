@@ -211,3 +211,30 @@ for (var in vetor_var){
   p4[[var]] <- limpa_var(p4[[var]])
 }
 ```
+
+---
+class: middle
+
+# Atividades em classe
+
+1. [Lab 5](https://www.places.education/disciplinas/intror_master/lab5/)
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+library(countdown)
+```
+
+```{r echo=FALSE}
+countdown(minutes = 60, seconds = 00, play_sound = TRUE)
+```
+
+---
+# Atividades para próxima semana
+
+Fechar todas as atividades e laboratórios propostos e não entregues. 
+
+---
+
+class: middle, center
+
+#DÚVIDAS?
+
