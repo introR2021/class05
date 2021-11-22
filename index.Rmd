@@ -217,7 +217,9 @@ class: middle
 
 # Atividades em classe
 
-1. [Lab 5](https://www.places.education/disciplinas/intror_master/lab5/)
+1. [Lab 5.1](https://www.places.education/disciplinas/intror_master/lab51/)
+
+2. [Lab 5.2](https://www.places.education/disciplinas/intror_master/lab52/)
 
 ```{r message=FALSE, warning=FALSE, include=FALSE}
 library(countdown)
