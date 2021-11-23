@@ -137,7 +137,7 @@ Note que podemos pensar um _for loop_ como uma função que recebe como argument
 
 Uma das bases mais estudadas em política comparada e estudos empíricos sobre é a Polity IV, que contém varáveis sobre diversas características de um conjunto grande de países e em vários anos. Quem quiser conhecer mais sobre os dados pode acessar [aqui](http://www.systemicpeace.org/inscrdata.html) ou ler a documentação [aqui](http://www.systemicpeace.org/inscr/p4manualv2016.pdf).
 
-A principal variável da base de dados é um indicador de grau de democracia que resulta da combinação de um conjunto variáveis componentes codificadas diretamente a partir da observação dos casos. Vamos ignorar seus significados e apenas observar que essas variáveis componentes recebem valores de 0 a 7, se o caso for uma democracia, ou os códigos -66, -77 e -88 em períodos autoritários ou de transição.
+A principal variável da base de dados é um indicador de grau de democracia que resulta da combinação de um conjunto variáveis componentes codificadas diretamente a partir da observação dos casos. Vamos ignorar seus significados e apenas observar que essas variáveis componentes recebem valores de 0 a 10, se o caso for uma democracia, ou os códigos -66, -77 e -88 em períodos autoritários ou de transição.
 
 ---
 
