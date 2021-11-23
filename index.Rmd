@@ -50,14 +50,21 @@ htmltools::tagList(
 )
 ```
 
+```{r xaringan-animate-css, echo=FALSE}
+xaringanExtra::use_animate_css()
+```
 
-
+```{r xaringan-scribble, echo=FALSE}
+xaringanExtra::use_scribble()
+```
 
 class: center, middle
 
 ## Retrospecto
 
 ---
+
+class: animated slideInRight fadeOutLeft
 
 ## Modelo conceitual da análise de dados
 
