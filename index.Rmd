@@ -1,8 +1,7 @@
 ---
-title: "Programando funções e interações"
-subtitle: "Mais sobre gráficos"
+title: "Acessibilidade Urbana"
 author: 
-  - <br></br>Renata Oliveira e Lucélia Vaz
+  - <br></br>Renata Oliveira
 date: '16/11/21'
 output:
   xaringan::moon_reader:
@@ -58,192 +57,42 @@ xaringanExtra::use_animate_css()
 xaringanExtra::use_scribble()
 ```
 
-class: center, middle
+class: center
 
-## Retrospecto
+# Mobilidade urbana x Acessibilidade urbana
+
+"O conceito de acesso a oportunidades está relacionado ao potencial de facilidade de locomoção, planejamento urbano, conectividade e eficiência dos meios de transporte, bem como ao planejamento e distribuição espacial dessas oportunidades no território. A acessibilidade é essencial para que as pessoas satisfaçam suas necessidades básicas, alcancem oportunidades de emprego e garantam uma renda"
+---
+
+class: center
+
+
+# Acessibilidade urbana
+"é facilidade de se chegar até oportunidades de emprego, serviços de saúde e educação, atividades culturais, áreas verdes, etc. O nível de acessibilidade de uma cidade ou bairro depende da eficiência e conectividade da rede de transporte, mas também da proximidade entre pessoas e atividades. A promoção de cidades mais sustentáveis, inclusivas e inteligentes exige políticas que melhorem a acessibilidade urbana e reduzam as desigualdades de acesso a oportunidades."
 
 ---
 
-class: animated slideInRight fadeOutLeft
-
-## Modelo conceitual da análise de dados
-
-![Modelo de Data Science](https://retaoliveira.github.io/relements/figures/dataR.png)
+Segundo Rafael, a definição de acessibilidade traz também, dentro de si, uma noção de liberdade, pois quanto mais acessibilidade a pessoa tem, maior a sua liberdade de escolha. E é esse poder de escolha que dá aos indivíduos a possibilidade de desenvolverem suas capacidades e optarem pelas opções que mais fazem sentido para elas.
 
 ---
 
-## Funções, iteração e vetorialização do código
+infelizmente, é comum notar na maioria das capitais uma grande desigualdade de oportunidades entre bairros mais ricos e mais pobres. Ele cita que em São Paulo o estudo identificou que a população rica consegue acessar nove vezes mais oportunidades de emprego em comparação a população mais pobre.
 
-Neste breve tutorial vamos ver alguns exemplos de como criar funções e utilizar processos iterativos (loops) reduzem bastante o esforço de programação e tornam o programa mais eficiente.
-
-Estes exemplos servirão de norte para que você leia, em sala, os capítulos [19 - Functions](http://r4ds.had.co.nz/functions.html), [20 - Iteration](http://r4ds.had.co.nz/iteration.html), e o trecho do capítulo [18 - Vectors](http://r4ds.had.co.nz/vectors.html#lists) que trata de listas.
+Curiosamente, uma cidade que vai de oposto a essa tendência, é Brasília. Na capital federal, o estudo constatou que em alguns bairros ricos, como Park Way, Lago Sul e Lago Norte, o acesso a alguns serviços é mais limitado do que em bairros mais pobres. "Como eles têm um planejamento recente, o governo não previu a criação de grandes ofertas de serviços públicos, como escolas públicas e postos de saúde", defende o convidado.
 
 ---
 
-## Exemplo 1 - substituindo repetição de código por loops
+Velocidade x proximidade
 
-Imagine que você precisa organizar dados dos candidatos à presidência de diversos anos (2006 a 2014) e vai utilizar a API do CEPESP Data. Utilizando a função _get_candidates_ do pacote _cepespR_ podemos obter os dados:
+Historicamente, uma das principais medidas tomadas em relação à política de transportes para solucionar problemas de segregação e desigualdade era tentar aumentar a velocidade dos veículos.
 
-```{r}
-library(cepespR)
-candidatos06 <- get_candidates(year = 2006, position = "President")
-candidatos10 <- get_candidates(year = 2010, position = "President")
-candidatos14 <- get_candidates(year = 2014, position = "President")
-```
-
-e, a seguir, podemos juntar todos em um único data_frame:
-
-```{r}
-candidatos <- rbind(candidatos06, candidatos10, candidatos14)
-```
-
----
-
-## Exemplo 1 - substituindo repetição de código por loops
-
-### Como podemos evitar a repetição de códigos?
-
-No exemplo acima, um simples _for loop_ resolveria nosso problema de repetição de código. Veja abaixo e tente entender sozinha(o) o que está acontencendo:
-
-```{r}
-library(dplyr)
-vetor_anos <- c(2006, 2010, 2014)
-candidatos <- data.frame()
-
-for (ano in vetor_anos){
-  candidatos <- bind_rows(candidatos, 
-                get_candidates(year = ano, position = "President"))
-}
-```
-
----
-
-## Exemplo 1 - substituindo repetição de código por loops
-
-Vamos supor agora que não queremos juntar todos os anos, apenas contar o número de linhas (que é o número de candidatos) em cada um dos anos e armazenar o resultado em um vetor. Veja como fazemos isso com um _for loop_:
-
-```{r}
-n_candidatos <- c()
-for (ano in vetor_anos){
-  n_candidatos <- c(n_candidatos, nrow(get_candidates(year = ano, position = "President")))
-}
-```
-
-Note que podemos pensar um _for loop_ como uma função que recebe como argumento um vetor e realiza a mesma tarefa para cada elemento do vetor.
-
----
-
-## Exemplo 2 - combinando loops e funções
-
-Uma das bases mais estudadas em política comparada e estudos empíricos sobre é a Polity IV, que contém varáveis sobre diversas características de um conjunto grande de países e em vários anos. Quem quiser conhecer mais sobre os dados pode acessar [aqui](http://www.systemicpeace.org/inscrdata.html) ou ler a documentação [aqui](http://www.systemicpeace.org/inscr/p4manualv2016.pdf).
-
-A principal variável da base de dados é um indicador de grau de democracia que resulta da combinação de um conjunto variáveis componentes codificadas diretamente a partir da observação dos casos. Vamos ignorar seus significados e apenas observar que essas variáveis componentes recebem valores de 0 a 10, se o caso for uma democracia, ou os códigos -66, -77 e -88 em períodos autoritários ou de transição.
-
----
-
-## Exemplo 2 - combinando loops e funções
-
-Comece abrindo os dados que estão no repositório do curso e criando uma cópia, 'p4', que será modificada.
-
-```{r}
-p4_raw <- read.csv2("https://raw.githubusercontent.com/leobarone/FLS6397_2018/master/data/p4v2016.csv")
-p4 <- p4_raw
-```
-
----
-
-## Exemplo 2 - combinando loops e funções
-Como as variáveis contêm alguns códigos numéricos cujas distâncias matemáticas não fazem nenhum sentido (-66, -77 e -88), precisamos transformá-los em NA para podermos calcular qualquer estatística descritiva com a variável. Vamos realizar a transformação nas variáveis 'xconst', 'xrreg', 'xropen', 'xconst' e aprender um novo operador, _%in%_. Todas as variáveis se referem sobre características da competição pelo poder Executivo em um país em um ano:
-
-```{r}
-p4$xrcomp[p4$xrcomp %in% c(-66, -77, -88)] <- NA
-p4$xrreg[p4$xrreg %in% c(-66, -77, -88)] <- NA
-p4$xropen[p4$xropen %in% c(-66, -77, -88)] <- NA
-p4$xconst[p4$xconst %in% c(-66, -77, -88)] <- NA
-```
-
----
-
-## Exemplo 2 - combinando loops e funções
-
-Como vamos repetir a mesma transformação de variáveis diversas vezes, convém escrever uma função para tal transformação. Observe com cuidado o código abaixo: 
-
-```{r}
-limpa_var <- function(x) {
-  x[x %in% c(-66, -77, -88)] <- NA
-  return(x)
-}
-```
-
----
-
-## Exemplo 2 - combinando loops e funções
-
-Vamos refazer o código acima utilizando a função que acabamos de criar (lembre-se criar um novo objeto 'p4', pois as variáveis foram transformadas no código anterior):
-
-```{r}
-p4 <- p4_raw
-p4$xrcomp <- limpa_var(p4$xrcomp)
-p4$xrreg <- limpa_var(p4$xrreg)
-p4$xropen <- limpa_var(p4$xropen)
-p4$xconst <- limpa_var(p4$xconst)
-
-```
-
----
-
-## Exemplo 2 - combinando loops e funções
-
-Ainda assim, temos muitas repetições de linha. O que muda de uma linha à outra é apenas o nome da variável. Como vimos no caso anterior, podemos realizar tarefas repetidas em loop. Vamos, dessa forma, aplicar a função que criamos em loop:
-
-```{r}
-p4 <- p4_raw
-vetor_var <- c('xrcomp', 'xrreg', 'xropen', 'xconst')
-for (var in vetor_var){
-  p4[, var] <- limpa_var(p4[, var])
-}
-```
+Porém, Rafael explica que a solução não está na velocidade, mas, sim, na proximidade. Ou seja, mais importante do que fazer as pessoas se locomoverem mais rápido, é fazer elas se locomoverem por distâncias menores, levando os serviços e oportunidades para perto delas. Assim, as pessoas conseguem fazer seu deslocamento diário utilizando formas de locomoção mais baratas e ecológicas, como bicicletas ou até mesmo a pé.
 
 
 ---
 
-## Exemplo 2 - combinando loops e funções
-
-Se estívessemos utilizando todas as variáveis do banco de dados codificadas da mesma maneira (são várias) teríamos uma economia bastante importante de código.
-
-Obs: uma forma alternativa de selecionar variáveis de um data frame utilizando colchetes é aplicando colchetes duplo (em vez de separar linhas e colunas dentro do colchetes por vírgula). O estilo de código abaixo, encontrado com frequência no livro "R for Data Science", é equivalente ao que acabamos de ver.
-
-```{r}
-for (var in vetor_var){
-  p4[[var]] <- limpa_var(p4[[var]])
-}
-```
-
----
-class: middle
-
-# Atividades em classe
-
-1. [Lab 5.1](https://www.places.education/disciplinas/intror_master/lab51/)
-
-2. [Lab 5.2](https://www.places.education/disciplinas/intror_master/lab52/)
-
-```{r message=FALSE, warning=FALSE, include=FALSE}
-library(countdown)
-```
-
-```{r echo=FALSE}
-countdown(minutes = 60, seconds = 00, play_sound = TRUE)
-```
-
----
-# Atividades para próxima semana
-
-Fechar todas as atividades e laboratórios propostos e não entregues. 
+https://www.ipea.gov.br/acessooportunidades/mapa/
 
 ---
 
-class: middle, center
-
-#DÚVIDAS?
-
+https://ipeagit.github.io/aopdata/
